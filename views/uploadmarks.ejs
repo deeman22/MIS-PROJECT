@@ -1,0 +1,986 @@
+<html>
+
+<head>
+    <title>Upload Marks </title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <style>
+        .body {
+            background-color: #f2f2f2;
+            padding: 0;
+        }
+
+        .Semester {
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            margin: 10px;
+            border: 2px solid rgb(126, 13, 32);
+            border-radius: 8px;
+            background: #fcfae5;
+            display: none;
+        }
+
+        .Isem,
+        .IIsem,
+        .IIIsem,
+        .IVsem,
+        .Vsem,
+        .VIsem {
+            margin: 10px;
+            border: 2px solid rgb(126, 13, 32);
+            border-radius: 8px;
+        }
+
+        /* .container {
+            height: 200px;
+            position: relative;
+            border: 3px solid green;
+        } */
+        .container,
+        .lbl {
+            margin-top: 20px;
+            margin: 10px;
+        }
+
+        .Semester h2 {
+            display: flex;
+            justify-content: center;
+        }
+
+        .Semester div span {
+            margin-left: 50%;
+            font-weight: normal;
+        }
+
+        .txtbox {
+            /* align : left; */
+            align-items: left;
+        }
+
+        .btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: black;
+            background-color: #65aee2;
+            margin: 4px 2px;
+        }
+
+        .btn:hover {
+            box-shadow: 0px 12px 16px 0 palegoldenrod, 0 17px 50 px 0 palegoldenrod;
+        }
+
+        .btnclass {
+            display: table;
+            margin: 0 auto
+        }
+
+        .centered-text {
+            margin-left: 30%;
+            font-family: Georgia, 'Times New Roman', Times, serif;
+            color: rgb(105, 26, 7);
+
+        }
+
+        .select-box {
+            margin-left: 20%;
+            margin-top: -2.5%;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("select").change(function () {
+                $(this).find("option:selected").each(function () {
+                    var opt = $(this).attr("value");
+                    if (opt) {
+                        $(".Semester").not("." + opt).hide();
+                        $("." + opt).show();
+                    } else {
+                        $(".Semester").hide();
+                    }
+                });
+            }).change();
+        });
+    </script>
+</head>
+
+<body>
+
+    <div class="col-lg-2 col-md-2 col-sm-12" style="padding: 10px; background-color: #d9ecf7;">
+        <img id="Image2" class=" center-block img-responsive" src="/images/jsr.png" align="middle"
+            style="width: 121px;">
+    </div>
+    <div class="col-lg-10 col-md-10 col-sm-12" style="background-color: #d9ecf7;">
+
+        <h2><span style="text-align: left; color: #0d47a1;">TIME SCHEDULE</span></h2>
+        <h4><span style="text-align: left;">National Institute of Technology Jamshedpur, Jamshedpur</span></h4>
+        <h6><span style="text-align: left;">An Institute of National Importance Established by Government of
+                India</span></h6>
+        <div style="text-align: right;" class="table_Heading">
+            <span id="lbldate"><%= currentDate %></span>
+            | <b><span id="lbltime" style="font-weight: 700"><%= currentTime %></span></b>
+        </div>
+        <div style="text-align: right;" class="table_Heading">
+            <i><span id="lbluser" class="table_Heading" style="font-weight:bold;">Welcome <%= u_name %> </span></i>
+
+        </div>
+    </div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin-bottom: 0;">
+        <div class="container">
+            <div class="navbar-header" style="padding-right: 2rem;">
+                <a class="navbar-brand" href="/admin_dashboard">Time Schedule</a>
+            </div>
+            <div class="navbar-header" style="padding-right: 2rem;">
+                <a class="navbar-brand" href="/">Answer Scripts</a>
+            </div>
+            <div class="navbar-header" style="padding-right: 2rem;">
+                <a class="navbar-brand" href="/result_process">Result Process</a>
+            </div>
+            <div class="navbar-header" style="float: right; ">
+                <a class="navbar-brand" href="/signout" style="color: rgb(255, 81, 0);">Logout</a>
+            </div>
+
+
+        </div>
+    </nav>
+
+    <form method="post">
+        <% if(success!=''){%>
+        <!-- <div class="alert alert-success centered-text">
+            <strong> </strong>
+        </div> -->
+        <div id="signupalert" class="alert alert-danger">
+            <p style="text-align: center;"><%= success %></p>
+        </div>
+        <%}%>
+        <h2 class="centered-text">Upload Marks </h2>
+        
+        <script>
+            function populate(s1, s2) {
+                var s1 = document.getElementById(s1);
+                var s2 = document.getElementById(s2);
+                s2.innerHTML = "";
+                if (s1.value == "mca") {
+                    var optionArray = ["Select Semester|Select Semester", "I|I", "II|II", "III|III", "IV|IV", "V|V", "VI|VI"];
+                } else if (s1.value == "btech") {
+                    var optionArray = ["Select Semester|Select Semester", "I|I", "II|II", "III|III", "IV|IV", "V|V", "VI|VI", "VII|VII", "VIII|VIII"];
+                }
+                else {
+                    var optionArray = ["Select Semester|Select Semester"];
+                }
+                for (var option in optionArray) {
+                    var pair = optionArray[option].split("|");
+                    var newOption = document.createElement("option");
+                    newOption.value = pair[0];
+                    newOption.innerHTML = pair[1];
+                    s2.options.add(newOption);
+                }
+            }
+        </script>
+        <br>
+        <div class="centered-text">Department :
+            <div class="select-box">
+                <select id=" slct1" name="slct1" onchange="populate(this.id,'slct2')">
+                    <option>Select Department </option>
+                    <option value="mca">MCA</option>
+                    <option value="btech">BTech</option>
+                </select>
+            </div>
+        </div>
+        <br>
+        <div class="centered-text">Semester:
+            <div class="select-box">
+                <select id="slct2" name="sem" value=''>
+                    <option>Select Semester</option>
+                </select>
+            </div>
+        </div>
+        <br>
+        </select>
+        <br>
+        <div class="centered-text">
+            <label>Registration Number : </label>
+            <div class="select-box"> <input type="text" value="" name="regd" width="50px" required>
+            </div>
+        </div>
+        <br><br>
+
+        <div class="I Semester">
+            <h2><b>I Semester</b></h2>
+            <div id="First" class="Isem">
+                <label class="lbl"><b>CA3101 : Computer Programming and Problem Solving using C</b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3101mid" class="txtbox">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3101test" class="txtbox">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3101assignment" class="txtbox">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3101end" class="txtbox">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Second" class="Isem">
+                <label class="lbl"><b>CA3102 : Computer Organisation & Architecture </b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3102mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3102test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3102assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3102end">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Third" class="Isem">
+                <label class="lbl"><b>CA3103 : Resource Management Techniques </b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3103mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3103test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3103assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3103end">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Forth" class="Isem">
+                <label class="lbl"><b>MA3101 : Mathematical Foundation Of Computer </b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="MA3101mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="MA3101test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="MA3101assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="MA3101end">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Fifth" class="Isem">
+                <label class="lbl"><b>MA3102 : Probability and Statistical Computing </b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="MA3102mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="MA3102test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="MA3102assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="MA3102end">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Sixth" class="Isem">
+                <label class="lbl"><b>CA3104 : Computer Programming in C LAB </b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3104mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3104test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3104assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3104end">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Seven" class="Isem">
+                <label class="lbl"><b>CA3105 : Statistical and Optimization Technique LAB</b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3105mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3105test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3105assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3105end">
+                    </span>
+                </div>
+                <br><br>
+            </div>
+        </div>
+        </div>
+
+        <div class="II Semester">
+            <h2><b>II Semester</b></h2>
+            <div id="First" class="IIsem">
+                <label class="lbl"><b>MA3201 : Numericals Methods </b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="MA3201mid" class="txtbox">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="MA3201test" class="txtbox">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="MA3201assignment" class="txtbox">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="MA3201end" class="txtbox">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Second" class="IIsem">
+                <label class="lbl"><b>CA3201 : <Object> Oriented Programming Using C++ </Object></b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3201mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3201test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3201assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3201end">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Third" class="IIsem">
+                <label class="lbl"><b>CA3202 : Data Structures </b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3202mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3202test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3202assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3202end">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Forth" class="IIsem">
+                <label class="lbl"><b>CA3203 : Object Oriented Analysis and Design </b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3203mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3203test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3203assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3203end">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Fifth" class="IIsem">
+                <label class="lbl"><b>CA3204 : Operating System </b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3204mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3204test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3204assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3204end">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Sixth" class="IIsem">
+                <label class="lbl"><b>CA3205 : Numerical Computing LAB </b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3205mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3205test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3205assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3205end">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Seven" class="IIsem">
+                <label class="lbl"><b>CA3206 : Data Structures LAB</b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3206mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3206test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3206assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3206end">
+                    </span>
+                </div>
+                <br><br>
+            </div>
+        </div>
+
+        <div name='sem' class="III Semester">
+            <h2><b>III Semester</b></h2>
+            <div id="First" class="IIIsem">
+                <label class="lbl"><b>CA3301 : Database Management System </b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3301mid" class="txtbox">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3301test" class="txtbox">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3301assignment" class="txtbox">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3301end" class="txtbox">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Second" class="IIIsem">
+                <label class="lbl"><b>CA3302 : <Object> Computer Communication and Networks </Object></b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3302mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3302test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3302assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3302end">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Third" class="IIIsem">
+                <label class="lbl"><b>CA3303 : Design and Analysis of Algorithm </b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3303mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3303test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3303assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3303end">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Forth" class="IIIsem">
+                <label class="lbl"><b>CA3304 : Computer Graphics </b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3304mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3304test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3304assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3304end">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Fifth" class="IIIsem">
+                <label class="lbl"><b>CA3305 : Java Programming </b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3305mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3305test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3305assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3305end">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Sixth" class="IIIsem">
+                <label class="lbl"><b>CA3306 : Database Management Lab </b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3306mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3306test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3306assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3306end">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Seven" class="IIIsem">
+                <label class="lbl"><b>CA3307 : Computer Graphics & Java Programming Lab</b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3307mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3307test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3307assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3307end">
+                    </span>
+                </div>
+                <br><br>
+            </div>
+        </div>
+        </div>
+
+        <div name='sem' class="IV Semester"> 
+            <h2><b>IV Semester</b></h2>
+            <div id="First" class="IIsem">
+                <label class="lbl"><b>CA3401 : Software Engineering </b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3401mid" class="txtbox">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3401test" class="txtbox">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3401assignment" class="txtbox">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3401end" class="txtbox">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Second" class="IVsem">
+                <label class="lbl"><b>CA3402 : <Object> Artificial Intelligence </Object></b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3402mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3402test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3402assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3402end">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Third" class="IVsem">
+                <label class="lbl"><b>CA3403 : Internet and Web Technology </b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3403mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3403test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3403assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3403end">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Forth" class="IVsem">
+                <label class="lbl"><b>CA3404 : Elective - I </b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3404mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3404test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3404assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3404end">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Fifth" class="IVsem">
+                <label class="lbl"><b>CA3405 : Elective - II</b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3405mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3405test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3405assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3405end">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Sixth" class="IVsem">
+                <label class="lbl"><b>CA3406 : Web Technology Lab </b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3406mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3406test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3406assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3406end">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Seven" class="IVsem">
+                <label class="lbl"><b>CA3407 : Elective LAB</b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3407mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3407test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3407assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3407end">
+                    </span>
+                </div>
+                <br><br>
+            </div>
+        </div>
+        </div>
+
+        <div name='sem' class="V Semester">
+            <h2><b>V Semester</b></h2>
+            <div id="First" class="Vsem">
+                <label class="lbl"><b>HS3501 : Financial Management </b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="HS3501mid" class="txtbox">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="HS3501test" class="txtbox">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="HS3501assignment" class="txtbox">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="HS3501end" class="txtbox">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Second" class="Vsem">
+                <label class="lbl"><b>HS3502 : <Object> Organization Behaviour and Management </Object></b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="HS3502mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="HS3502test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="HS3502assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="HS3502end">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Third" class="Vsem">
+                <label class="lbl"><b>CA3501 : Unix & Shell Programming </b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3501mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3501test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3501assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3501end">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Forth" class="Vsem">
+                <label class="lbl"><b>CA3502 : Elective - III </b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3502mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3502test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3502assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3502end">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Fifth" class="Vsem">
+                <label class="lbl"><b>CA3503 : Elective - IV </b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3503mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3503test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3503assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3503end">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Sixth" class="Vsem">
+                <label class="lbl"><b>CA3504 : OS and Network Lab </b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3504mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3504test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3504assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3504end">
+                    </span>
+                </div>
+            </div>
+            <br><br>
+
+            <div id="Seven" class="Vsem">
+                <label class="lbl"><b>CA3505 : Mini Project Work</b></label>
+                <div class="container">
+                    <label>Mid sem: </label>
+                    <input type="text" value="" name="CA3505mid">
+                    <span>
+                        <label>Test</label>
+                        <input type="text" value="" name="CA3505test">
+                    </span>
+                </div>
+                <div class="container">
+                    <label>Assignment</label>
+                    <input type="text" value="" name="CA3505assignment">
+                    <span>
+                        <label>End Sem</label>
+                        <input type="text" value="" name="CA3505end">
+                    </span>
+                </div>
+                <br><br>
+            </div>
+        </div>
+        </div> 
+
+        <div name='sem' class="VI Semester">
+            <h2><b>VI Semester</b></h2>
+            <div id="First" class="VIsem">
+                <label class="lbl"><b>CA3601 : Thesis/Project/Industrial Project </b></label>
+                <div class="container">
+                    <label>Total Marks : </label>
+                    <input type="text" value="" name="CA3601project" class="txtbox">
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="btnclass">
+                <button type="save" class="btn" style="">Save</button>
+            </div>
+            
+        </div>
+    </form>
+
+</body>
+
+</html>

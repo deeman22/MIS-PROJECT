@@ -1,7 +1,16 @@
 var mongoose = require('mongoose');
 
-const DB = "mongodb+srv://Bist_Man:LNK2207myP@cluster0.uurus.mongodb.net/nitjDB";
-mongoose.connect(DB , {useNewUrlParser: true});
+const DB = "mongodb+srv://Bist_Man:qwerty123@cluster0.uurus.mongodb.net/nitjDB?retryWrites=true&w=majority";
+//mongoose.connect(DB , {useNewUrlParser: true});
+mongoose.connect(DB , {useNewUrlParser: true},function(err){
+    if(!err)
+        console.log("Database Connected..");
+        
+        
+    else
+        console.log(err);
+
+});
 var conn = mongoose.Collection;
 
 var mca_studentSchema= new mongoose.Schema({
@@ -13,6 +22,5 @@ var mca_studentSchema= new mongoose.Schema({
 });
 
 
-var mca_student = mongoose.model('mca_student', mca_studentSchema);
-module.exports = mca_student;
-// module.exports.findMcaStudent = findMcaStudent;
+var McaStudent = mongoose.model('mca_student', mca_studentSchema);
+module.exports = McaStudent;

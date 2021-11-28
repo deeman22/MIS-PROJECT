@@ -5,10 +5,20 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 
+///
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');// users/:Id/:pass
+var dashboardRouter = require('./routes/dashboard');
+var admin_dashboardRouter = require('./routes/admin_dashboard');
+var edit_examRouter = require('./routes/edit_exam');
+var uploadmarksRouter = require('./routes/upload_marks');
 
 var app = express();
+///
+var indexRouter = require('./routes/index');
+//var usersRouter = require('./routes/users');// users/:Id/:pass
+
+var app = express();
+app.locals.moment = require('moment');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -21,7 +31,12 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+// app.use('/dashboard', dashboardRouter);
+// app.use('/admin_dashboard', admin_dashboardRouter);
+// app.use('/admin_dashboard/edit_exam/:_id?', edit_examRouter);
+// app.use('/uploadmarks', uploadmarksRouter);
+
+//app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -1,15 +1,16 @@
 var express = require('express');
+var router = express.Router();
 var bodyParser = require('body-parser');
 var moment = require('moment');
-
+var jwt = require('jsonwebtoken');
+const { check, validationResult } = require('express-validator');
 
 var Teacher = require('../modules/teacher');
 var McaStudent = require('../modules/mca_student');
 var Exam = require('../modules/subject');
 var marksModel = require('../modules/testMarks');
 
-var jwt = require('jsonwebtoken');
-const app = require('../app');
+var router = express.Router();
 
 
 /* ----------MEMORY ALLOCATION FOR TOKEN--------------- */
@@ -18,71 +19,6 @@ if(typeof localStorage === "undefined" || localStorage === null) {
   localStorage = new LocalStorage('./scratch');
 }
 
-var router = express.Router();
-
-
-/* to encrypt use module bcrypt */
-
-/*----------MIDDLEWARE TO CREATE USER TOKEN----------*/
-function checkUser(req,res,next){
-  var username=req.body.uname;
-  var password=req.body.password;
-
-  if(username.includes("PGCACA")){
-    var checkUser= McaStudent.findOne({id:username, password:password});
-    checkUser.exec((err, data)=>{
-      if (data == null) {
-       
-        return res.render('login', {
-          msg: "Invalid Username or Password.",
-          currentDate: moment().format('dddd[,] ll'),
-          currentTime: moment().format(' h:mm A')
-      
-       });
-  
-     }else{
-  
-        if(err) throw err;
-        var getUserID=data._id;
-        var getUser = data.first_name + " " + data.last_name;
-        var getUserSem = data.semester;
-        var token = jwt.sign({ userID: getUserID }, 'loginToken');
-        localStorage.setItem('userToken', token);
-        localStorage.setItem('loginUser', getUser);
-        localStorage.setItem('userType','S' );
-        localStorage.setItem('userSem', getUserSem);
-        return res.redirect('./dashboard');
-        
-      }
-    });
-  }
-  else {
-      var checkUser= Teacher.findOne({id:username, password:password});
-      checkUser.exec((err, data)=>{
-        if(data==null){
-          return res.render('login', {
-            msg: "Invalid Username or Password.",
-            currentDate: moment().format("dddd[,] ll"),
-            currentTime: moment().format(' h:mm A')
-          });
-  
-        }else{
-  
-          if(err) throw err;
-          var getUserID=data._id;
-          var getUser = data.first_name+ " " + data.last_name ;
-          var token = jwt.sign({ userID: getUserID }, 'loginToken');
-          localStorage.setItem('userToken', token);
-          localStorage.setItem('loginUser', getUser);
-          localStorage.setItem('userType','T' );
-          return res.redirect('/admin_dashboard');
-          
-        }
-      });
-  }
- next();
-
-}
 
 /* -------MIDDLEWARE TO VALIDATE USER----------*/
 
@@ -98,143 +34,9 @@ function checkLogin(req,res,next){
   next();
 }
 
-
-/*----------LOGIN PAGE---------------*/
-
-router.get('/', function(req, res, next) {
-  var loginUser = localStorage.getItem('loginUser');
-  
-  if (loginUser) {
-
-    var userType = localStorage.getItem('userType');
-    if (userType == 'S') {
-      res.redirect('./dashboard');
-    } else if (userType == 'T') {
-      res.redirect('./admin_dashboard');
-    }
-
-  }else{
-    res.render('login', {
-      msg: '',
-      currentDate: moment().format("dddd[,] ll"),
-      currentTime: moment().format(' h:mm A')
-    });
-  }
-});
-
-router.post('/', checkUser, function (req, res, next) { });
-
-
-/* ----------STUDENT DASHBOARD PAGE--------------- */
-router.get('/dashboard', checkLogin, function(req, res, next) {
-  
-  var u_name = localStorage.getItem('loginUser');
-  var userSem = localStorage.getItem('userSem');
-  var userType = localStorage.getItem('userType');
-  if (userType == 'T') {
-    res.redirect('/admin_dashboard');
-  } else {
-
-    Exam.findOne({ semester: userSem }).then((data) => {
-      var examDetails = data.subjects;
-      var sortedExamDetails = examDetails.sort(function (a, b) {
-        return a.exam_date - b.exam_date;
-      });
-      res.render('dashboard', {
-        u_name: u_name, currentDate: moment().format("dddd[,] ll"),
-        currentTime: moment().format(' h:mm A'),
-        examDetails: sortedExamDetails
-      });
-
-    }, (err) => {
-      console.log(err);
-    });
-  }
-});
-
-/* ----------TEACHER DASHBOARD PAGE--------------- */
-
-router.get('/admin_dashboard', checkLogin, function(req, res, next) {
-  
-  var u_name = localStorage.getItem('loginUser');
-  var userType = localStorage.getItem('userType');
-  if (userType == 'S') {
-    res.redirect('/dashboard');
-  } else {
-    var mySort = { semester: 1 };
-
-    Exam.find({}, null, { sort: mySort }).then((data) => {
-      //var allExamDetails = data;
-      res.render('admin_dashboard', {
-        u_name: u_name,
-        currentDate: moment().format("dddd[,] ll"),
-        currentTime: moment().format(' h:mm A'),
-        allExamDetails: data,
-        msg:''
-      });
-    }, (err) => {
-      console.log(err);
-    });
-  }
-});
-
-// /* ----------EDIT EXAM PAGE--------------- */
-
-router.get('/admin_dashboard/edit_exam/:_id?', checkLogin, function (req, res, next) {
-  var exam_id = req.query.exam_id;
-  var loginUser = localStorage.getItem('loginUser');
-  var userType = localStorage.getItem('userType');
-  if (userType == 'S') {
-    console.log(exam_id);
-    res.redirect('/dashboard', { exam_id : exam_id });
-  }
-  else {
-    var _id = req.params._id;
-    Exam.findOne({ _id: _id }).then((data) => {
-      var examDetails = data;
-      res.render('edit_exam', {
-        u_name: loginUser,
-        currentDate: moment().format("dddd[,] ll"),
-        currentTime: moment().format(' h:mm A'),
-        examDetails: examDetails,
-        exam_id: exam_id
-      });
-    }, (err) => {
-      console.log(err);
-    });
-  }
-
-});
-
-router.post('/admin_dashboard/edit_exam/:_id?',checkLogin ,function (req, res, next) {
-  var _id =  req.params._id;
-  var updatedDate = new Date(req.body.exam_date);
-  
-  Exam.findOneAndUpdate({ 'subjects._id': _id }, { $set: { 'subjects.$.exam_date': updatedDate } }, { new: true })
-  .then((result, err) => {
-    if (err) {
-      console.log(err);
-      res.json(err);
-    }
-    else {
-      console.log("Date updated successfully ");
-      res.redirect('/admin_dashboard');
-    }
-  });
-  
-
-});
-/* -------<<<<<<<---BIPUL--->>>>>>------------ */
-/* ----------UPLOAD MARKS / RESULT PROCESS--------------- */
-
+/* ----------UPLOAD MARKS--------------- */
 router.get('/result_process', (req, res) => {
-  var loginUser = localStorage.getItem('loginUser');
-  res.render('uploadmarks', {
-    success: '',
-    u_name: loginUser,
-    currentDate: moment().format("dddd[,] ll"),
-    currentTime: moment().format(' h:mm A')
-  });
+    res.render('uploadmarks', { success: '' });
 });
 
 
@@ -565,52 +367,29 @@ router.post('/result_process', (req, res) => {
             }
 
             if (req.body.sem == 'VI') {
-              console.log('sixth');
-              var marksSix = new marksModel.firstMarksModel({
-                'regd': req.body.regd,
-                'sem': req.body.sem,
-                'CA3601': {
-                  'project': req.body.CA3601project,
-                  'total': parseInt(req.body.CA3601project)
-                }
-              });
-
-              marksSix.save(function (err, data) {
-                if (err) throw error;
-                var loginUser = localStorage.getItem('loginUser');
-                
-                res.render('uploadmarks', {
-                  success: 'Record inserted successfully!',
-                  u_name: loginUser,
-                  currentDate: moment().format("dddd[,] ll"),
-                  currentTime: moment().format(' h:mm A')
+                console.log('sixth');
+                var marksSix = new marksModel.firstMarksModel({
+                    'regd': req.body.regd,
+                    'sem': req.body.sem,
+                    'CA3601': {
+                        'project': req.body.CA3601project,
+                        'total': parseInt(req.body.CA3601project)
+                    }
                 });
-                console.log(data);
-              });
+
+                marksSix.save(function (err, data) {
+                    if (err) throw error;
+                    res.render('uploadmarks', { success: 'Record inserted successfully!' });
+                    console.log(data);
+                })
             }
         }
         else {
-          var loginUser = localStorage.getItem('loginUser');
-          res.render('uploadmarks', {
-            success: 'Record already present',
-            u_name: loginUser,
-            currentDate: moment().format("dddd[,] ll"),
-            currentTime: moment().format(' h:mm A')
-          });
+            res.render('uploadmarks', { success: 'Record already present' });
         }
 
     });
   
 });
 
-
-
-/* ----------SIGNOUT--------------- */
-router.get('/signout', function(req, res, next) {
-  localStorage.removeItem('userToken');
-  localStorage.removeItem('loginUser');
-  res.redirect('/');
-});
-
 module.exports = router;
-
