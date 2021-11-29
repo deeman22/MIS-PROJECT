@@ -4,9 +4,7 @@ const DB = "mongodb+srv://Bist_Man:qwerty123@cluster0.uurus.mongodb.net/nitjDB?r
 //mongoose.connect(DB , {useNewUrlParser: true});
 mongoose.connect(DB , {useNewUrlParser: true},function(err){
     if(!err)
-        console.log("Database Connected..");
-        
-        
+        console.log("Database Connected..👍");
     else
         console.log(err);
 

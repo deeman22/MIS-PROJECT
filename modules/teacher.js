@@ -4,7 +4,7 @@ const DB = "mongodb+srv://Bist_Man:qwerty123@cluster0.uurus.mongodb.net/nitjDB?r
 //mongoose.connect(DB , {useNewUrlParser: true});
 mongoose.connect(DB , {useNewUrlParser: true},function(err){
     if(!err)
-        console.log("Database Connected..");
+        console.log("Database Connected..😌");
     else
         console.log(err);
 
@@ -23,13 +23,12 @@ var Teacher = mongoose.model('teacher', teacherSchema);
 module.exports = Teacher;
 
 
-                                                   
-//                                                  
+                                                                                                  
 
 // <% examDetails.forEach(function(examDetails) { %>
-//                                                     <td style="width:10px;text-align:center;"> <%= i+1 %> </td>
-//                                                     <td style="width:200px;text-align:left;padding-left:10px;">
-//                                                         <%= examDetails[i].id+ " - " +examDetails[i].name %> </td>
-//                                                     <td style="width:80px;text-align:center;">
-//                                                         <%= examDetails[i].exam_date %> </td>
-//                                                     <% }); %>
+// <td style="width:10px;text-align:center;"> <%= i+1 %> </td>
+// <td style="width:200px;text-align:left;padding-left:10px;">
+// <%= examDetails[i].id+ " - " +examDetails[i].name %> </td>
+// <td style="width:80px;text-align:center;">
+// <%= examDetails[i].exam_date %> </td>
+// <% }); %>
