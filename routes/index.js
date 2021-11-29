@@ -10,6 +10,7 @@ var marksModel = require('../modules/testMarks');
 
 var jwt = require('jsonwebtoken');
 const app = require('../app');
+const session = require('express-session');
 
 
 /* ----------MEMORY ALLOCATION FOR TOKEN--------------- */
@@ -46,6 +47,7 @@ function checkUser(req,res,next){
         var getUserID=data._id;
         var getUser = data.first_name + " " + data.last_name;
         var getUserSem = data.semester;
+        req.session.user = getUserID;
         var token = jwt.sign({ userID: getUserID }, 'loginToken');
         localStorage.setItem('userToken', token);
         localStorage.setItem('loginUser', getUser);
@@ -70,11 +72,12 @@ function checkUser(req,res,next){
   
           if(err) throw err;
           var getUserID=data._id;
-          var getUser = data.first_name+ " " + data.last_name ;
+          var getUser = data.first_name + " " + data.last_name;
+          req.session.user = getUserID;
           var token = jwt.sign({ userID: getUserID }, 'loginToken');
           localStorage.setItem('userToken', token);
           localStorage.setItem('loginUser', getUser);
-          localStorage.setItem('userType','T' );
+          localStorage.setItem('userType', 'T');
           return res.redirect('/admin_dashboard');
           
         }
@@ -88,8 +91,14 @@ function checkUser(req,res,next){
 
 function checkLogin(req,res,next){
   var userToken = localStorage.getItem('userToken');
-  try{
-    var decode = jwt.verify(userToken, 'loginToken');
+  try {
+    if(req.session.user){
+      jwt.verify(userToken, 'loginToken');
+      //next();
+    }
+    else {
+      res.redirect('/');
+    }
    // return next();
   } catch(err){
     //return 
@@ -102,8 +111,8 @@ function checkLogin(req,res,next){
 /*----------LOGIN PAGE---------------*/
 
 router.get('/', function(req, res, next) {
-  var loginUser = localStorage.getItem('loginUser');
-  
+  //var loginUser = localStorage.getItem('loginUser');
+  var loginUser = req.session.user;
   if (loginUser) {
 
     var userType = localStorage.getItem('userType');
@@ -201,6 +210,7 @@ router.get('/admin_dashboard/edit_exam/:_id?', checkLogin, function (req, res, n
       });
     }, (err) => {
       console.log(err);
+
     });
   }
 
@@ -213,8 +223,9 @@ router.post('/admin_dashboard/edit_exam/:_id?',checkLogin ,function (req, res, n
   Exam.findOneAndUpdate({ 'subjects._id': _id }, { $set: { 'subjects.$.exam_date': updatedDate } }, { new: true })
   .then((result, err) => {
     if (err) {
+      res.redirect('/admin_dashboard');
       console.log(err);
-      res.json(err);
+      
     }
     else {
       console.log("Date updated successfully ");
@@ -227,7 +238,7 @@ router.post('/admin_dashboard/edit_exam/:_id?',checkLogin ,function (req, res, n
 /* -------<<<<<<<---BIPUL--->>>>>>------------ */
 /* ----------UPLOAD MARKS / RESULT PROCESS--------------- */
 
-router.get('/result_process', (req, res) => {
+router.get('/result_process',checkLogin ,(req, res) => {
   var loginUser = localStorage.getItem('loginUser');
   res.render('uploadmarks', {
     success: '',
@@ -238,7 +249,7 @@ router.get('/result_process', (req, res) => {
 });
 
 
-router.post('/result_process', (req, res) => {
+router.post('/result_process',checkLogin ,(req, res) => {
     
     var chk = marksModel.firstMarksModel.find({ sem: req.body.sem, regd: req.body.regd });
     chk.exec(async function (err1, res1) {
@@ -606,9 +617,17 @@ router.post('/result_process', (req, res) => {
 
 
 /* ----------SIGNOUT--------------- */
-router.get('/signout', function(req, res, next) {
+router.get('/signout', function (req, res, next) {
+  
+  req.session.destroy(function (err) {
+    if (err) {
+      res.redirect('/');
+    }
+  });
   localStorage.removeItem('userToken');
   localStorage.removeItem('loginUser');
+  localStorage.removeItem('userType');
+  localStorage.removeItem('userSem');
   res.redirect('/');
 });
 
