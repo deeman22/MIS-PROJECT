@@ -7,6 +7,7 @@ var Teacher = require('../modules/teacher');
 var McaStudent = require('../modules/mca_student');
 var Exam = require('../modules/subject');
 var marksModel = require('../modules/testMarks');
+var marks =  marksModel.firstMarksModel;
 
 var jwt = require('jsonwebtoken');
 const app = require('../app');
@@ -84,28 +85,25 @@ function checkUser(req,res,next){
       });
   }
  next();
-
 }
 
 /* -------MIDDLEWARE TO VALIDATE USER----------*/
-
 function checkLogin(req,res,next){
   var userToken = localStorage.getItem('userToken');
   try {
     if(req.session.user){
       jwt.verify(userToken, 'loginToken');
-      //next();
     }
     else {
       res.redirect('/');
     }
-   // return next();
   } catch(err){
     //return 
     res.redirect('/');
   }
   next();
 }
+
 
 
 /*----------LOGIN PAGE---------------*/
@@ -220,7 +218,7 @@ router.post('/admin_dashboard/edit_exam/:_id?',checkLogin ,function (req, res, n
   var _id =  req.params._id;
   var updatedDate = new Date(req.body.exam_date);
   
-  Exam.findOneAndUpdate({ 'subjects._id': _id }, { $set: { 'subjects.$.exam_date': updatedDate } }, { new: true })
+  Exam.findOneAndUpdate({ 'subjects._id': _id },{ $set: { 'subjects.$.exam_date': updatedDate } }, { new: true })
   .then((result, err) => {
     if (err) {
       res.redirect('/admin_dashboard');
@@ -315,7 +313,12 @@ router.post('/result_process',checkLogin ,(req, res) => {
 
                 marksOne.save(function (err, data) {
                     if (err) throw error;
-                    res.render('uploadmarks', { success: 'Record inserted successfully!' });
+                  res.render('uploadmarks', {
+                    success: 'Record inserted successfully!',
+                    u_name: loginUser,
+                    currentDate: moment().format("dddd[,] ll"),
+                    currentTime: moment().format(' h:mm A')
+                  });
                     console.log(data);
                 })
             }
@@ -379,7 +382,12 @@ router.post('/result_process',checkLogin ,(req, res) => {
 
                 marksTwo.save(function (err, data) {
                     if (err) throw error;
-                    res.render('uploadmarks', { success: 'Record inserted successfully!' });
+                  res.render('uploadmarks', {
+                    success: 'Record inserted successfully!',
+                    u_name: loginUser,
+                    currentDate: moment().format("dddd[,] ll"),
+                    currentTime: moment().format(' h:mm A')
+                  });
                     console.log(data);
                 })
             }
@@ -443,7 +451,12 @@ router.post('/result_process',checkLogin ,(req, res) => {
 
                 marksThree.save(function (err, data) {
                     if (err) throw error;
-                    res.render('uploadmarks', { success: 'Record inserted successfully!' });
+                  res.render('uploadmarks', {
+                    success: 'Record inserted successfully!',
+                    u_name: loginUser,
+                    currentDate: moment().format("dddd[,] ll"),
+                    currentTime: moment().format(' h:mm A')
+                  });
                     console.log(data);
                 })
             }
@@ -506,7 +519,12 @@ router.post('/result_process',checkLogin ,(req, res) => {
 
                 marksFour.save(function (err, data) {
                     if (err) throw error;
-                    res.render('uploadmarks', { success: 'Record inserted successfully!' });
+                  res.render('uploadmarks', {
+                    success: 'Record inserted successfully!',
+                    u_name: loginUser,
+                    currentDate: moment().format("dddd[,] ll"),
+                    currentTime: moment().format(' h:mm A')
+                  });
                     console.log(data);
                 })
             }
@@ -569,8 +587,13 @@ router.post('/result_process',checkLogin ,(req, res) => {
 
 
                 marksFive.save(function (err, data) {
-                    if (err) throw error;
-                    res.render('uploadmarks', { success: 'Record inserted successfully!' });
+                  if (err) throw error;
+                  res.render('uploadmarks', {
+                    success: 'Record inserted successfully!',
+                    u_name: loginUser,
+                    currentDate: moment().format("dddd[,] ll"),
+                    currentTime: moment().format(' h:mm A')
+                  });
                     console.log(data);
                 })
             }
@@ -613,8 +636,23 @@ router.post('/result_process',checkLogin ,(req, res) => {
     });
   
 });
+/*-----------VIEW MARKS----------------*/
+router.get('/result', checkLogin, function(req, res, next) {
+  res.render('result', { title: 'Student record', records:''});
+  
+});
 
-
+router.post('/result', checkLogin, function(req, res){
+  var result = marks.find({sem:req.body.slct2, regd:req.body.regd});
+  console.log(req.body.slct2);
+  console.log(req.body.regd);
+  result.exec(function(err,data){
+    if(err) throw err;
+    console.log(data);
+    res.render('result', { title: 'Student record', records:data});
+  
+  })
+});
 
 /* ----------SIGNOUT--------------- */
 router.get('/signout', function (req, res, next) {
@@ -624,10 +662,11 @@ router.get('/signout', function (req, res, next) {
       res.redirect('/');
     }
   });
-  localStorage.removeItem('userToken');
-  localStorage.removeItem('loginUser');
-  localStorage.removeItem('userType');
-  localStorage.removeItem('userSem');
+  // localStorage.removeItem('userToken');
+  // localStorage.removeItem('loginUser');
+  // localStorage.removeItem('userType');
+  // localStorage.removeItem('userSem');
+  localStorage.clear();
   res.redirect('/');
 });
 

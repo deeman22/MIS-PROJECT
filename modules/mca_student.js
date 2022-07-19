@@ -16,7 +16,7 @@ var mca_studentSchema= new mongoose.Schema({
     first_name: {type: String, required: true },
     last_name: {type: String, required: true },
     password: {type: String, required: true },
-    semester:{ type: Number, min: 1, max:6, required: true },
+    semester:{ type: Number, min: 1, max:6, required: true }
 });
 
 
